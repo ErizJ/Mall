@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "./pb";
+
+service OrderService {
+    rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+    rpc GetOrder(GetOrderRequest) returns (OrderInfo);
+    rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+    rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (Empty);
+}
+
+message CreateOrderRequest {
+    string user_id = 1;
+    repeated OrderItem items = 2;
+    string address = 3;
+    string payment_method = 4;
+}
+
+message CreateOrderResponse {
+    string order_id = 1;
+}
+
+message OrderItem {
+    int64 product_id = 1;
+    int32 quantity = 2;
+    float price = 3;
+}
+
+message GetOrderRequest {
+    string order_id = 1;
+}
+
+message OrderInfo {
+    string order_id = 1;
+    string user_id = 2;
+    repeated OrderItem items = 3;
+    float total_amount = 4;
+    string status = 5; // 订单状态，如：已支付、已发货、已完成
+    string address = 6;
+    string payment_method = 7;
+    string created_at = 8;
+}
+
+message ListOrdersRequest {
+    string user_id = 1;
+    int32 page = 2;
+    int32 page_size = 3;
+}
+
+message ListOrdersResponse {
+    repeated OrderInfo orders = 1;
+    int32 total = 2;
+}
+
+message UpdateOrderStatusRequest {
+    string order_id = 1;
+    string status = 2;
+}
+
+message Empty {}

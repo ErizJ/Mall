@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "mall/user";
+
+message Empty {}
+
+service UserService {
+    // 用户注册
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    // 用户登录
+    rpc Login(LoginRequest) returns (LoginResponse);
+    // 获取用户详情
+    rpc GetUser(GetUserRequest) returns (UserInfo);
+    // 更新用户信息
+    rpc UpdateUser(UpdateUserRequest) returns (Empty);
+    // 列出用户（管理员用）
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+}
+
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+}
+
+message RegisterResponse {
+    string user_id = 1;
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string token = 1; // 登录后返回的JWT等认证token
+}
+
+message GetUserRequest {
+    string user_id = 1;
+}
+
+message UserInfo {
+    string user_id = 1;
+    string username = 2;
+    string email = 3;
+    string phone = 4;
+    string avatar_url = 5;
+    bool is_admin = 6;
+}
+
+message UpdateUserRequest {
+    string user_id = 1;
+    string email = 2;
+    string phone = 3;
+    string avatar_url = 4;
+}
+
+message ListUsersRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+}
+
+message ListUsersResponse {
+    repeated UserInfo users = 1;
+    int32 total = 2;
+}

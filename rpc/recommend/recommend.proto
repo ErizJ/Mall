@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package recommend;
+
+option go_package = "mall/recommend";
+
+service RecommendService {
+    // 根据用户ID推荐商品列表
+    rpc RecommendProducts(RecommendRequest) returns (RecommendResponse);
+}
+
+message RecommendRequest {
+    string user_id = 1;
+    int32 limit = 2; // 推荐商品数量
+}
+
+message ProductBrief {
+    int64 product_id = 1;
+    string name = 2;
+    float price = 3;
+    string image_url = 4;
+}
+
+message RecommendResponse {
+    repeated ProductBrief products = 1;
+}

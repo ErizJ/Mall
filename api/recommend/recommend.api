@@ -1,0 +1,29 @@
+syntax = "v1"
+
+info (
+	title:   "Recommend Service API"
+	desc:    "推荐服务API"
+	version: "1.0"
+)
+
+type RecommendRequest {
+	user_id string
+	limit   int32
+}
+
+type ProductBrief {
+	product_id int64
+	name       string
+	price      float32
+	image_url  string
+}
+
+type RecommendResponse {
+	products []ProductBrief
+}
+
+service RecommendService {
+	@handler RecommendProducts
+	post /recommend/products (RecommendRequest) returns (RecommendResponse)
+}
+

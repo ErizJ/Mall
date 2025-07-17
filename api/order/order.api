@@ -1,0 +1,64 @@
+type CreateOrderRequest {
+	user_id        string
+	items          []OrderItem
+	address        string
+	payment_method string
+}
+
+type CreateOrderResponse {
+	order_id string
+}
+
+type OrderItem {
+	product_id int64
+	quantity   int32
+	price      float32
+}
+
+type GetOrderRequest {
+	order_id string
+}
+
+type OrderInfo {
+	order_id       string
+	user_id        string
+	items          []OrderItem
+	total_amount   float32
+	status         string
+	address        string
+	payment_method string
+	created_at     string
+}
+
+type ListOrdersRequest {
+	user_id   string
+	page      int32
+	page_size int32
+}
+
+type ListOrdersResponse {
+	orders []OrderInfo
+	total  int32
+}
+
+type UpdateOrderStatusRequest {
+	order_id string
+	status   string
+}
+
+type Empty {}
+
+service OrderService {
+	@handler CreateOrder
+	post /order/create (CreateOrderRequest) returns (CreateOrderResponse)
+
+	@handler GetOrder
+	get /order/get (GetOrderRequest) returns (OrderInfo)
+
+	@handler ListOrders
+	get /order/list (ListOrdersRequest) returns (ListOrdersResponse)
+
+	@handler UpdateOrderStatus
+	post /order/status/update (UpdateOrderStatusRequest) returns (Empty)
+}
+

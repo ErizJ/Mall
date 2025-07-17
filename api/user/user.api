@@ -1,0 +1,76 @@
+syntax = "v1"
+
+info (
+	title:   "User Service API"
+	desc:    "用户服务API"
+	version: "1.0"
+)
+
+type Empty {}
+
+type RegisterRequest {
+	username string
+	password string
+	email    string
+}
+
+type RegisterResponse {
+	user_id string
+}
+
+type LoginRequest {
+	username string
+	password string
+}
+
+type LoginResponse {
+	token string
+}
+
+type GetUserRequest {
+	user_id string `path:"user_id"`
+}
+
+type UserInfo {
+	user_id    string
+	username   string
+	email      string
+	phone      string
+	avatar_url string
+	is_admin   bool
+}
+
+type UpdateUserRequest {
+	user_id    string
+	email      string
+	phone      string
+	avatar_url string
+}
+
+type ListUsersRequest {
+	page      int32 `form:"page"`
+	page_size int32 `form:"page_size"`
+}
+
+type ListUsersResponse {
+	users []UserInfo
+	total int32
+}
+
+service UserService {
+	@handler Register
+	post /user/register (RegisterRequest) returns (RegisterResponse)
+
+	@handler Login
+	post /user/login (LoginRequest) returns (LoginResponse)
+
+	@handler GetUser
+	get /user/:user_id (GetUserRequest) returns (UserInfo)
+
+	@handler UpdateUser
+	put /user/update (UpdateUserRequest) returns (Empty)
+
+	@handler ListUsers
+	get /users (ListUsersRequest) returns (ListUsersResponse)
+}
+

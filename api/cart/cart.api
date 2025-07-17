@@ -1,0 +1,47 @@
+type AddItemRequest {
+	user_id    string
+	product_id int64
+	quantity   int32
+}
+
+type RemoveItemRequest {
+	user_id    string
+	product_id int64
+}
+
+type ListItemsRequest {
+	user_id string
+}
+
+type CartItem {
+	product_id   int64
+	product_name string
+	quantity     int32
+	price        float32
+	image_url    string
+}
+
+type ListItemsResponse {
+	items []CartItem
+}
+
+type ClearCartRequest {
+	user_id string
+}
+
+type Empty {}
+
+service CartService {
+	@handler AddItem
+	post /cart/item/add (AddItemRequest) returns (Empty)
+
+	@handler RemoveItem
+	post /cart/item/remove (RemoveItemRequest) returns (Empty)
+
+	@handler ListItems
+	get /cart/items (ListItemsRequest) returns (ListItemsResponse)
+
+	@handler ClearCart
+	post /cart/clear (ClearCartRequest) returns (Empty)
+}
+
