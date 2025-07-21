@@ -3,8 +3,8 @@ package logic
 import (
 	"context"
 
-	"mall/product/internal/svc"
-	"mall/product/mall/product"
+	"mall/rpc/product/internal/svc"
+	product "mall/rpc/product/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

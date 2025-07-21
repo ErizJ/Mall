@@ -4,11 +4,14 @@ package product;
 
 option go_package = "./pb";
 
+import "google/protobuf/timestamp.proto";
+
+// 商品服务接口
 service ProductService {
-    // 商品列表
+    // 商品列表，分页查询
     rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
 
-    // 获取商品详情
+    // 获取单个商品详情
     rpc GetProduct(GetProductRequest) returns (Product);
 
     // 创建商品
@@ -19,88 +22,68 @@ service ProductService {
 
     // 删除商品
     rpc DeleteProduct(DeleteProductRequest) returns (Empty);
-
-    // 搜索提示词（联想词）
-    rpc SearchSuggestions(SuggestionsRequest) returns (SuggestionsResponse);
-
-    // 搜索商品
-    rpc SearchProducts(SearchRequest) returns (SearchResponse);
 }
 
+// 请求分页列表参数
 message ListProductsRequest {
-    int32 page = 1;
-    int32 page_size = 2;
-    string keyword = 3; // 商品名关键词搜索
-    repeated int64 category_ids = 4; // 分类筛选
+    int64 page = 1;
+    int64 page_size = 2;
+    string keyword = 3;                    // 商品名关键词搜索
+    repeated int64 category_ids = 4;       // 分类筛选（使用分类 ID）
 }
 
+// 分页列表响应
 message ListProductsResponse {
     repeated Product products = 1;
-    int32 total = 2;
+    int64 total = 2; // 使用 int64 避免溢出
 }
 
+// 获取商品详情请求
 message GetProductRequest {
     int64 product_id = 1;
 }
 
+// 商品数据结构，与数据库字段一一对应
 message Product {
-    int64 product_id = 1;
-    string name = 2;
-    string description = 3;
-    float price = 4;
-    int32 stock = 5;
-    repeated string images = 6; // 商品图片URL列表
-    int64 category_id = 7;
+    int64 product_id = 1;                      // 商品ID
+    string name = 2;                           // 商品名称
+    string description = 3;                    // 商品描述
+    double price = 4;                          // 价格
+    int64 stock = 5;                           // 库存数量
+    string image_url = 6;                      // 商品图片 URL
+    int64 category_id = 7;                     // 商品分类 ID
+    bool is_available = 8;                     // 是否上架
+    google.protobuf.Timestamp created_at = 9; // 创建时间
+    google.protobuf.Timestamp updated_at = 10;// 更新时间
 }
 
+// 创建商品请求
 message CreateProductRequest {
     string name = 1;
     string description = 2;
-    float price = 3;
-    int32 stock = 4;
-    repeated string images = 5;
+    double price = 3;
+    int64 stock = 4;
+    string image_url = 5;
     int64 category_id = 6;
+    bool is_available = 7;
 }
 
+// 更新商品请求
 message UpdateProductRequest {
     int64 product_id = 1;
     string name = 2;
     string description = 3;
-    float price = 4;
-    int32 stock = 5;
-    repeated string images = 6;
+    double price = 4;
+    int64 stock = 5;
+    string image_url = 6;
     int64 category_id = 7;
+    bool is_available = 8;
 }
 
+// 删除商品请求
 message DeleteProductRequest {
     int64 product_id = 1;
 }
 
+// 空消息体，用于不需要返回内容的接口
 message Empty {}
-
-message SuggestionsRequest {
-    string prefix = 1; // 输入前缀
-    int32 limit = 2;   // 返回数量限制
-}
-
-message SuggestionsResponse {
-    repeated string suggestions = 1;
-}
-
-message SearchRequest {
-    string keyword = 1;  // 搜索关键词
-    int32 page = 2;
-    int32 page_size = 3;
-}
-
-message ProductBrief {
-    int64 product_id = 1;
-    string name = 2;
-    float price = 3;
-    string image_url = 4;
-}
-
-message SearchResponse {
-    repeated ProductBrief products = 1;
-    int32 total = 2;
-}

@@ -1,6 +1,10 @@
-Name: product.rpc
+Name: ProductRpc
 ListenOn: 0.0.0.0:8080
+Mode: dev  # 指定当前运行模式
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+    - 127.0.0.1:2379
   Key: product.rpc
+
+Mysql:
+  Dsn: root:398632@tcp(127.0.0.1:3306)/mall?charset=utf8mb4&parseTime=True&loc=Local

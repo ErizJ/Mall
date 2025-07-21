@@ -1,3 +1,16 @@
 Name: ProductService
 Host: 0.0.0.0
 Port: 8888
+
+cors:
+  allowOrigin: "http://localhost:8081"
+  allowMethods: "GET,POST,OPTIONS"
+  allowHeaders: "Origin,Content-Type"
+  allowCredentials: true
+
+ProductRpc:
+  Timeout: 5000
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: product.rpc

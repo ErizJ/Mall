@@ -1,0 +1,78 @@
+syntax = "v1"
+
+type ListProductsRequest {
+	page         int64
+	page_size    int64
+	keyword      string
+	category_ids []int64
+}
+
+type Product {
+	product_id   int64
+	name         string
+	description  string
+	price        float64
+	stock        int64
+	image_url    string
+	category_id  int64
+	is_available bool
+	created_at   string
+	updated_at   string
+}
+
+type ListProductsResponse {
+	products []Product
+	total    int64
+}
+
+type GetProductRequest {
+	product_id int64
+}
+
+type CreateProductRequest {
+	name         string
+	description  string
+	price        float64
+	stock        int64
+	image_url    string
+	category_id  int64
+	is_available bool
+}
+
+type UpdateProductRequest {
+	product_id   int64
+	name         string
+	description  string
+	price        float64
+	stock        int64
+	image_url    string
+	category_id  int64
+	is_available bool
+}
+
+type DeleteProductRequest {
+	product_id int64
+}
+
+type Empty {}
+
+@server (
+	cors: true
+)
+service ProductService {
+	@handler ListProducts
+	post /products (ListProductsRequest) returns (ListProductsResponse)
+
+	@handler GetProduct
+	get /product/:product_id (GetProductRequest) returns (Product)
+
+	@handler CreateProduct
+	post /product/create (CreateProductRequest) returns (Product)
+
+	@handler UpdateProduct
+	put /product/update (UpdateProductRequest) returns (Empty)
+
+	@handler DeleteProduct
+	delete /product/delete (DeleteProductRequest) returns (Empty)
+}
+
