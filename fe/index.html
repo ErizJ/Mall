@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>带登录注册+结算订单功能的简洁商城</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f7f9fc;
+    margin: 0; padding: 20px;
+    color: #333;
+  }
+  /* 顶部登录状态栏 */
+  #header {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+  }
+  #header span {
+    margin-right: 10px;
+  }
+  #loginBtn, #logoutBtn {
+    cursor: pointer;
+    color: #007bff;
+    border: none;
+    background: none;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+  }
+  #loginBtn:hover, #logoutBtn:hover {
+    background-color: #e3f0ff;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #222;
+  }
+  .search-box {
+    max-width: 400px;
+    margin: 0 auto 30px;
+    display: flex;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
+  }
+  .search-box input {
+    flex-grow: 1;
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+  }
+  .search-box button {
+    background: #007bff;
+    border: none;
+    color: white;
+    padding: 0 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+  .search-box button:hover {
+    background: #0056b3;
+  }
+  .products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+    position: relative;
+  }
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgb(0 0 0 / 0.1);
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    transition: transform 0.2s ease;
+    position: relative;
+  }
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+  .product-image {
+    width: 100%;
+    height: 140px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #fafafa;
+    margin-bottom: 12px;
+  }
+  .product-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    min-height: 48px;
+  }
+  .product-price {
+    font-size: 16px;
+    color: #e55353;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .btn-add {
+    margin-top: auto;
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 10px 0;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  .btn-add:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+  }
+  .btn-add:hover:not(:disabled) {
+    background-color: #218838;
+  }
+  /* 购物车部分 */
+  .cart-section {
+    max-width: 900px;
+    margin: 40px auto 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 14px rgb(0 0 0 / 0.12);
+    padding: 25px;
+  }
+  .cart-section h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #222;
+  }
+  .cart-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .cart-item:last-child {
+    border-bottom: none;
+  }
+  .cart-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  .cart-item-info {
+    flex: 1;
+    margin-left: 15px;
+  }
+  .cart-item-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  .cart-item-qty-price {
+    color: #555;
+    font-size: 14px;
+  }
+  .cart-remove-btn {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+  }
+  .cart-remove-btn:hover {
+    background-color: #a71d2a;
+  }
+  .cart-total {
+    text-align: right;
+    font-weight: 700;
+    font-size: 20px;
+    margin-top: 25px;
+    color: #222;
+  }
+  /* 结算和订单按钮 */
+  #checkoutBtn, #ordersBtn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #checkoutBtn {
+    background-color: #007bff;
+  }
+  #checkoutBtn:hover {
+    background-color: #0056b3;
+  }
+  #ordersBtn {
+    background-color: #28a745;
+    margin-left: 15px;
+  }
+  #ordersBtn:hover {
+    background-color: #1e7e34;
+  }
+  /* 商品详情悬浮窗样式 */
+  #productTooltip {
+    position: fixed;
+    z-index: 9999;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 15px;
+    width: 280px;
+    pointer-events: none; /* 鼠标穿透 */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 14px;
+    color: #444;
+  }
+  #productTooltip.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #productTooltip img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #fafafa;
+  }
+  #productTooltip .tooltip-name {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  #productTooltip .tooltip-price {
+    color: #e55353;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  #productTooltip .tooltip-desc {
+    line-height: 1.4;
+    color: #666;
+  }
+  /* 登录注册弹窗 */
+  #authModal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+  }
+  #authModal.active {
+    display: flex;
+  }
+  #authContent {
+    background: white;
+    border-radius: 12px;
+    width: 380px;
+    padding: 30px 25px 25px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  #authContent h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+  }
+  .tab-buttons {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+  }
+  .tab-buttons button {
+    flex: 1;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.25s ease;
+    font-size: 16px;
+  }
+  .tab-buttons button.active {
+    border-color: #007bff;
+    color: #007bff;
+  }
+  form {
+    display: none;
+  }
+  form.active {
+    display: block;
+  }
+  form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  form input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  form input:focus {
+    border-color: #007bff;
+  }
+  form button.submit-btn {
+    width: 100%;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 12px 0;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  form button.submit-btn:hover {
+    background-color: #0056b3;
+  }
+  .error-msg {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: -12px;
+    margin-bottom: 10px;
+    min-height: 18px;
+  }
+  #authCloseBtn {
+    position: absolute;
+    right: 15px; top: 15px;
+    cursor: pointer;
+    font-size: 22px;
+    color: #666;
+    border: none;
+    background: none;
+  }
+  #authCloseBtn:hover {
+    color: #222;
+  }
+  /* 提示消息 */
+  #messageBox {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #323232;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 11000;
+  }
+  #messageBox.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部登录状态 -->
+<div id="header">
+  <span id="welcomeMsg" style="display:none;"></span>
+  <button id="loginBtn">登录 / 注册</button>
+  <button id="logoutBtn" style="display:none;">登出</button>
+</div>
+
+<h1>带登录注册+结算订单功能的简洁商城</h1>
+
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="搜索商品..." />
+  <button id="searchBtn">搜索</button>
+</div>
+
+<div class="products" id="productsContainer">
+  <!-- 商品卡片动态插入 -->
+</div>
+
+<div class="cart-section" id="cartSection" style="display:none;">
+  <h2>购物车</h2>
+  <div class="cart-list" id="cartList"></div>
+  <div style="text-align:right;">
+    <div class="cart-total" id="cartTotal"></div>
+    <button id="checkoutBtn">去结算</button>
+    <button id="ordersBtn">我的订单</button>
+  </div>
+</div>
+
+<!-- 商品详情悬浮窗 -->
+<div id="productTooltip"></div>
+
+<!-- 登录注册弹窗 -->
+<div id="authModal">
+  <div id="authContent">
+    <button id="authCloseBtn" title="关闭">&times;</button>
+    <h3>用户认证</h3>
+    <div class="tab-buttons">
+      <button id="tabLogin" class="active">登录</button>
+      <button id="tabRegister">注册</button>
+    </div>
+    <form id="loginForm" class="active" novalidate>
+      <label for="loginUsername">用户名</label>
+      <input type="text" id="loginUsername" required minlength="3" />
+      <div class="error-msg" id="loginUserError"></div>
+      <label for="loginPassword">密码</label>
+      <input type="password" id="loginPassword" required minlength="6" />
+      <div class="error-msg" id="loginPassError"></div>
+      <button type="submit" class="submit-btn">登录</button>
+    </form>
+    <form id="registerForm" novalidate>
+      <label for="registerUsername">用户名</label>
+      <input type="text" id="registerUsername" required minlength="3" />
+      <div class="error-msg" id="registerUserError"></div>
+      <label for="registerPassword">密码</label>
+      <input type="password" id="registerPassword" required minlength="6" />
+      <div class="error-msg" id="registerPassError"></div>
+      <label for="registerConfirmPassword">确认密码</label>
+      <input type="password" id="registerConfirmPassword" required minlength="6" />
+      <div class="error-msg" id="registerConfirmError"></div>
+      <button type="submit" class="submit-btn">注册</button>
+    </form>
+  </div>
+</div>
+
+<!-- 提示消息 -->
+<div id="messageBox"></div>
+
+<script>
+  const products = [
+    { id: 1, name: '苹果 iPhone 15', price: 7999, image: 'https://via.placeholder.com/220x140?text=iPhone+15', desc: '苹果最新款智能手机，搭载A17芯片，性能强劲，拍照优秀。' },
+    { id: 2, name: '华为 Mate 60', price: 6899, image: 'https://via.placeholder.com/220x140?text=Huawei+Mate+60', desc: '华为旗舰手机，麒麟9000芯片，支持超级快充，拍摄效果出色。' },
+    { id: 3, name: '小米手环 8', price: 299, image: 'https://via.placeholder.com/220x140?text=Xiaomi+Band+8', desc: '轻便智能手环，健康监测，运动数据精准，长续航。' },
+    { id: 4, name: '索尼 WH-1000XM5', price: 2499, image: 'https://via.placeholder.com/220x140?text=Sony+WH-1000XM5', desc: '顶级降噪耳机，音质纯净，佩戴舒适，适合长时间使用。' },
+    { id: 5, name: '戴尔 XPS 15', price: 13999, image: 'https://via.placeholder.com/220x140?text=Dell+XPS+15', desc: '戴尔高性能笔记本，15英寸4K屏，搭载Intel i7处理器，适合专业设计。' },
+    { id: 6, name: '罗技 MX Master 3 鼠标', price: 799, image: 'https://via.placeholder.com/220x140?text=Logitech+MX+Master+3', desc: '罗技旗舰级无线鼠标，精准控制，支持多设备切换，人体工程学设计。' },
+  ];
+
+  let cart = [];
+  let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+
+  const productsContainer = document.getElementById('productsContainer');
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const cartSection = document.getElementById('cartSection');
+  const cartList = document.getElementById('cartList');
+  const cartTotal = document.getElementById('cartTotal');
+  const productTooltip = document.getElementById('productTooltip');
+
+  // 登录相关元素
+  const header = document.getElementById('header');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const welcomeMsg = document.getElementById('welcomeMsg');
+  const authModal = document.getElementById('authModal');
+  const authCloseBtn = document.getElementById('authCloseBtn');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabRegister = document.getElementById('tabRegister');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+
+  // 错误提示元素
+  const loginUserError = document.getElementById('loginUserError');
+  const loginPassError = document.getElementById('loginPassError');
+  const registerUserError = document.getElementById('registerUserError');
+  const registerPassError = document.getElementById('registerPassError');
+  const registerConfirmError = document.getElementById('registerConfirmError');
+
+  // 结算和订单按钮
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const ordersBtn = document.getElementById('ordersBtn');
+
+  // 提示消息元素
+  const messageBox = document.getElementById('messageBox');
+
+  // 模拟用户数据库（localStorage存储）
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '[]');
+  }
+  function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  // 当前登录用户
+  function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser') || 'null');
+  }
+  function setCurrentUser(user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  }
+  function clearCurrentUser() {
+    localStorage.removeItem('currentUser');
+  }
+
+  // 保存订单
+  function saveOrders() {
+    localStorage.setItem('orders', JSON.stringify(orders));
+  }
+  // 生成订单ID
+  function generateOrderId() {
+    return 'ORD' + Date.now();
+  }
+
+  // 显示提示消息
+  function showMessage(msg, duration = 2500) {
+    messageBox.textContent = msg;
+    messageBox.classList.add('show');
+    setTimeout(() => {
+      messageBox.classList.remove('show');
+    }, duration);
+  }
+
+  // 渲染登录状态栏
+  function renderLoginStatus() {
+    const user = getCurrentUser();
+    if (user) {
+      welcomeMsg.textContent = `欢迎，${user.username}`;
+      welcomeMsg.style.display = 'inline-block';
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'inline-block';
+    } else {
+      welcomeMsg.style.display = 'none';
+      loginBtn.style.display = 'inline-block';
+      logoutBtn.style.display = 'none';
+    }
+    updateAddToCartButtons();
+  }
+
+  // 禁用/启用加入购物车按钮（未登录禁用）
+  function updateAddToCartButtons() {
+    const user = getCurrentUser();
+    document.querySelectorAll('.btn-add').forEach(btn => {
+      btn.disabled = !user;
+      btn.title = user ? '' : '请先登录';
+    });
+  }
+
+  // 渲染商品卡片，支持搜索过滤
+  function renderProducts(filterText = '') {
+    productsContainer.innerHTML = '';
+    const filtered = products.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()));
+    if (filtered.length === 0) {
+      productsContainer.innerHTML = '<p style="color:#666;">没有找到相关商品。</p>';
+      return;
+    }
+    filtered.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.dataset.id = p.id;
+      card.innerHTML = `
+        <img class="product-image" src="${p.image}" alt="${p.name}" />
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">¥${p.price.toFixed(2)}</div>
+        <button class="btn-add" data-id="${p.id}">加入购物车</button>
+      `;
+      productsContainer.appendChild(card);
+    });
+    updateAddToCartButtons();
+  }
+
+  // 渲染购物车
+  function renderCart() {
+    if (cart.length === 0) {
+      cartSection.style.display = 'none';
+      return;
+    }
+    cartSection.style.display = 'block';
+    cartList.innerHTML = '';
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+      itemDiv.innerHTML = `
+        <img src="${item.image}" alt="${item.name}" />
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-qty-price">¥${item.price.toFixed(2)} × ${item.quantity}</div>
+        </div>
+        <button class="cart-remove-btn" data-id="${item.id}">删除</button>
+      `;
+      cartList.appendChild(itemDiv);
+    });
+    cartTotal.textContent = `总价: ¥${total.toFixed(2)}`;
+  }
+
+  // 添加商品到购物车
+  function addToCart(id) {
+    const user = getCurrentUser();
+    if (!user) {
+      showMessage('请先登录再加入购物车');
+      return;
+    }
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+    renderCart();
+  }
+
+  // 从购物车删除商品
+  function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    renderCart();
+  }
+
+  // 搜索处理
+  function handleSearch() {
+    const val = searchInput.value.trim();
+    renderProducts(val);
+  }
+
+  // 商品详情悬浮窗显示
+  function showTooltip(product, x, y) {
+    productTooltip.innerHTML = `
+      <img src="${product.image}" alt="${product.name}" />
+      <div class="tooltip-name">${product.name}</div>
+      <div class="tooltip-price">¥${product.price.toFixed(2)}</div>
+      <div class="tooltip-desc">${product.desc}</div>
+    `;
+    const padding = 15;
+    const tooltipWidth = 280;
+    const tooltipHeight = 280;
+    let left = x + 15;
+    let top = y + 15;
+    if (left + tooltipWidth + padding > window.innerWidth) {
+      left = x - tooltipWidth - 15;
+    }
+    if (top + tooltipHeight + padding > window.innerHeight) {
+      top = y - tooltipHeight - 15;
+    }
+    productTooltip.style.left = left + 'px';
+    productTooltip.style.top = top + 'px';
+    productTooltip.classList.add('visible');
+  }
+  function hideTooltip() {
+    productTooltip.classList.remove('visible');
+  }
+
+  // 切换登录注册tab
+  function switchTab(tab) {
+    if (tab === 'login') {
+      tabLogin.classList.add('active');
+      tabRegister.classList.remove('active');
+      loginForm.classList.add('active');
+      registerForm.classList.remove('active');
+    } else {
+      tabLogin.classList.remove('active');
+      tabRegister.classList.add('active');
+      loginForm.classList.remove('active');
+      registerForm.classList.add('active');
+    }
+    clearFormErrors();
+  }
+
+  // 清除所有表单错误信息
+  function clearFormErrors() {
+    loginUserError.textContent = '';
+    loginPassError.textContent = '';
+    registerUserError.textContent = '';
+    registerPassError.textContent = '';
+    registerConfirmError.textContent = '';
+  }
+
+  // 登录表单校验
+  function validateLoginForm() {
+    let valid = true;
+    const username = loginForm.loginUsername.value.trim();
+    const password = loginForm.loginPassword.value.trim();
+
+    if (username.length < 3) {
+      loginUserError.textContent = '用户名至少3个字符';
+      valid = false;
+    } else {
+      loginUserError.textContent = '';
+    }
+    if (password.length < 6) {
+      loginPassError.textContent = '密码至少6个字符';
+      valid = false;
+    } else {
+      loginPassError.textContent = '';
+    }
+    return valid;
+  }
+
+  // 注册表单校验
+  function validateRegisterForm() {
+    let valid = true;
+    const username = registerForm.registerUsername.value.trim();
+    const password = registerForm.registerPassword.value.trim();
+    const confirmPass = registerForm.registerConfirmPassword.value.trim();
+
+    if (username.length < 3) {
+      registerUserError.textContent = '用户名至少3个字符';
+      valid = false;
+    } else {
+      registerUserError.textContent = '';
+    }
+    if (password.length < 6) {
+      registerPassError.textContent = '密码至少6个字符';
+      valid = false;
+    } else {
+      registerPassError.textContent = '';
+    }
+    if (confirmPass !== password) {
+      registerConfirmError.textContent = '两次密码不一致';
+      valid = false;
+    } else {
+      registerConfirmError.textContent = '';
+    }
+    return valid;
+  }
+
+  // 登录处理
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateLoginForm()) return;
+
+    const username = loginForm.loginUsername.value.trim();
+    const password = loginForm.loginPassword.value.trim();
+
+    const users = getUsers();
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+      setCurrentUser(user);
+      showMessage(`登录成功，欢迎 ${username}`);
+      authModal.classList.remove('active');
+      renderLoginStatus();
+      loginForm.reset();
+    } else {
+      showMessage('用户名或密码错误');
+    }
+  });
+
+  // 注册处理
+  registerForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateRegisterForm()) return;
+
+    const username = registerForm.registerUsername.value.trim();
+    const password = registerForm.registerPassword.value.trim();
+
+    const users = getUsers();
+    if (users.some(u => u.username === username)) {
+      registerUserError.textContent = '用户名已被注册';
+      return;
+    }
+    users.push({ username, password });
+    saveUsers(users);
+    showMessage('注册成功，请登录');
+    switchTab('login');
+    registerForm.reset();
+  });
+
+  // 事件监听
+
+  // 打开登录注册弹窗
+  loginBtn.addEventListener('click', () => {
+    authModal.classList.add('active');
+    switchTab('login');
+  });
+
+  // 关闭弹窗
+  authCloseBtn.addEventListener('click', () => {
+    authModal.classList.remove('active');
+  });
+  authModal.addEventListener('click', e => {
+    if (e.target === authModal) {
+      authModal.classList.remove('active');
+    }
+  });
+
+  // tab切换
+  tabLogin.addEventListener('click', () => switchTab('login'));
+  tabRegister.addEventListener('click', () => switchTab('register'));
+
+  // 加入购物车按钮
+  productsContainer.addEventListener('click', e => {
+    if (e.target.classList.contains('btn-add')) {
+      const id = Number(e.target.dataset.id);
+      addToCart(id);
+    }
+  });
+
+  // 购物车删除按钮
+  cartList.addEventListener('click', e => {
+    if (e.target.classList.contains('cart-remove-btn')) {
+      const id = Number(e.target.dataset.id);
+      removeFromCart(id);
+    }
+  });
+
+  // 搜索功能
+  searchBtn.addEventListener('click', handleSearch);
+  searchInput.addEventListener('keyup', e => {
+    if (e.key === 'Enter') handleSearch();
+  });
+
+  // 商品详情悬浮窗显示
+  productsContainer.addEventListener('mousemove', e => {
+    const card = e.target.closest('.product-card');
+    if (card) {
+      const id = Number(card.dataset.id);
+      const product = products.find(p => p.id === id);
+      if (product) {
+        showTooltip(product, e.clientX, e.clientY);
+      }
+    } else {
+      hideTooltip();
+    }
+  });
+  productsContainer.addEventListener('mouseleave', hideTooltip);
+
+  // 登出
+  logoutBtn.addEventListener('click', () => {
+    clearCurrentUser();
+    cart = [];
+    renderCart();
+    renderLoginStatus();
+    showMessage('已登出');
+  });
+
+  // 去结算按钮事件
+  checkoutBtn.addEventListener('click', () => {
+    if (cart.length === 0) {
+      showMessage('购物车为空，无法结算');
+      return;
+    }
+    const user = getCurrentUser();
+    if (!user) {
+      showMessage('请先登录');
+      return;
+    }
+    const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2);
+    if (confirm(`确认支付 ¥${total} 吗？`)) {
+      const order = {
+        id: generateOrderId(),
+        user: user.username,
+        items: cart.map(({ id, name, price, quantity, image }) => ({ id, name, price, quantity, image })),
+        total: parseFloat(total),
+        status: '已支付',
+        time: new Date().toLocaleString(),
+      };
+      orders.push(order);
+      saveOrders();
+      cart = [];
+      renderCart();
+      showMessage('支付成功，订单已生成');
+    }
+  });
+
+  // 我的订单按钮事件
+  ordersBtn.addEventListener('click', () => {
+    const user = getCurrentUser();
+    if (!user) {
+      showMessage('请先登录查看订单');
+      return;
+    }
+    const userOrders = orders.filter(o => o.user === user.username);
+    if (userOrders.length === 0) {
+      alert('暂无订单');
+      return;
+    }
+    let orderStr = '我的订单：\n\n';
+    userOrders.forEach(o => {
+      orderStr += `订单号: ${o.id}\n时间: ${o.time}\n状态: ${o.status}\n商品:\n`;
+      o.items.forEach(i => {
+        orderStr += `  ${i.name} × ${i.quantity}  ¥${(i.price * i.quantity).toFixed(2)}\n`;
+      });
+      orderStr += `总价: ¥${o.total.toFixed(2)}\n\n`;
+    });
+    alert(orderStr);
+  });
+
+  // 初始化渲染
+  renderProducts();
+  renderCart();
+  renderLoginStatus();
+</script>
+
+</body>
+</html>
